@@ -10,61 +10,61 @@ div.px-20.pb-20.pt-5.h-screen.bg-slate-900
 import InputSection from './components/InputSection.vue'
 import DisplaySection from './components/DisplaySection.vue'
 import { provide, ref, reactive, readonly } from 'vue'
-import { v4 as uuidv4 } from 'uuid'
 
-const treeData = reactive({
-  root: [
-    {
-      id: uuidv4(),
-      key: 'nav',
-      children: [
-        {
-          id: uuidv4(),
-          key: 'header',
-          children: [
-            {
-              id: uuidv4(),
-              key: 'creator',
-              value: '3D Fabric Creator',
-            },
-            {
-              id: uuidv4(),
-              key: 'product',
-              value: 'Product',
-            },
-          ],
-        },
-        {
-          id: uuidv4(),
-          key: 'icon',
-          value: 'icon name',
-        },
-      ],
-    },
-    {
-      id: uuidv4(),
-      key: 'common',
-      children: [
-        {
-          id: uuidv4(),
-          key: 'feature',
-          children: [
-            {
-              id: uuidv4(),
-              key: 'experience',
-              value: 'Try It Now!',
-            },
-            {
-              id: uuidv4(),
-              key: 'chooseFabric',
-              value: 'Choose Fabric',
-            },
-          ],
-        },
-      ],
-    },
-  ],
-})
+let rawData = reactive([
+  { 'nav.header.creator': '3D Fabric Creator' },
+  { 'nav.header.product': 'Product' },
+  { 'nav.icon': 'icon name' },
+  {
+    'common.feature.experience': 'Try It Now!',
+  },
+  {
+    'common.feature.chooseFabric': 'Choose Fabric',
+  },
+])
 
-provide('treeData', readonly(treeData.root))
+// 新增一欄資料
+const addInput = () => {
+  rawData.push({})
+}
+
+// 刪除一列資料
+const deleteInput = () => {
+  const target = event.target.previousSibling.firstChild.value
+  // TODO 修改刪除邏輯
+  rawData = rawData.filter((item) => target !== Object.keys(item)[0])
+}
+
+// 把 rawData 轉換成巢狀陣列
+const deepen = (obj) => {
+  const result = {}
+
+  for (const objectPath in obj) {
+    // Split path into component parts
+    const parts = objectPath.split('.')
+
+    // Create sub-objects along path as needed
+    let target = result
+    while (parts.length > 1) {
+      const part = parts.shift()
+      target = target[part] = target[part] || {}
+    }
+
+    // Set value at end of path
+    target[parts[0]] = obj[objectPath]
+  }
+
+  return result
+}
+
+// const output = JSON.stringify(deepen(rawData))
+//   .split(/{:}"]/)
+//   .map((s) => s.trim())
+
+// console.log(output)
+
+provide('rawData', readonly(rawData))
+provide('treeData', readonly(deepen(rawData)))
+provide('addInput', addInput)
+provide('deleteInput', deleteInput)
 </script>
