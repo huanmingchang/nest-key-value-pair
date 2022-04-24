@@ -10,61 +10,70 @@ div.px-20.pb-20.pt-5.h-screen.bg-slate-900
 import InputSection from './components/InputSection.vue'
 import DisplaySection from './components/DisplaySection.vue'
 import { provide, ref, reactive, readonly } from 'vue'
+import _ from 'lodash'
 
+let treeObj = { root: {} }
 let rawData = reactive([
-  { 'nav.header.creator': '3D Fabric Creator' },
-  { 'nav.header.product': 'Product' },
-  { 'nav.icon': 'icon name' },
-  {
-    'common.feature.experience': 'Try It Now!',
-  },
-  {
-    'common.feature.chooseFabric': 'Choose Fabric',
-  },
+  ['nav.header.creator', '3D Fabric Creator'],
+  ['nav.header.product', 'Product'],
+  ['nav.icon', 'icon name'],
+  ['common.feature.experience', 'Try It Now!'],
+  ['common.feature.chooseFabric', 'Choose Fabric'],
 ])
+
+// 轉換原始資料成巢狀 object
+const covertDataToTreeObject = (arr) => {
+  for (let i = 0; i < arr.length; i++) {
+    _.set(treeObj.root, arr[i][0], arr[i][1])
+  }
+
+  return treeObj
+}
 
 // 新增一欄資料
 const addInput = () => {
-  rawData.push({})
+  rawData.push([])
 }
 
 // 刪除一列資料
 const deleteInput = () => {
   const target = event.target.previousSibling.firstChild.value
-  // TODO 修改刪除邏輯
-  rawData = rawData.filter((item) => target !== Object.keys(item)[0])
-}
-
-// 把 rawData 轉換成巢狀陣列
-const deepen = (obj) => {
-  const result = {}
-
-  for (const objectPath in obj) {
-    // Split path into component parts
-    const parts = objectPath.split('.')
-
-    // Create sub-objects along path as needed
-    let target = result
-    while (parts.length > 1) {
-      const part = parts.shift()
-      target = target[part] = target[part] || {}
+  for (let i = 0; i < rawData.length; i++) {
+    if (target === rawData[i][0]) {
+      rawData.splice(rawData[i], 1)
     }
-
-    // Set value at end of path
-    target[parts[0]] = obj[objectPath]
   }
 
-  return result
+  // rawData = rawData.filter((item) => target !== item[0])
 }
 
-// const output = JSON.stringify(deepen(rawData))
-//   .split(/{:}"]/)
-//   .map((s) => s.trim())
+// 輸入資料
 
-// console.log(output)
+// 把 rawData 轉換成巢狀物件
+// const deepen = (obj) => {
+//   const result = {}
+
+//   for (const objectPath in obj) {
+//     // Split path into component parts
+//     const parts = objectPath.split('.')
+
+//     // Create sub-objects along path as needed
+//     let target = result
+//     while (parts.length > 1) {
+//       const part = parts.shift()
+//       target = target[part] = target[part] || {}
+//     }
+
+//     // Set value at end of path
+//     target[parts[0]] = obj[objectPath]
+//   }
+
+//   return result
+// }
 
 provide('rawData', readonly(rawData))
-provide('treeData', readonly(deepen(rawData)))
+provide('treeData', readonly(covertDataToTreeObject(rawData)))
+// provide('treeData', readonly(deepen(rawData)))
 provide('addInput', addInput)
 provide('deleteInput', deleteInput)
 </script>
