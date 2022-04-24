@@ -12,7 +12,7 @@ import DisplaySection from './components/DisplaySection.vue'
 import { provide, ref, reactive, readonly } from 'vue'
 import _ from 'lodash'
 
-let treeObj = { root: {} }
+let treeObj = reactive({ root: {} })
 let rawData = reactive([
   ['nav.header.creator', '3D Fabric Creator'],
   ['nav.header.product', 'Product'],
@@ -30,7 +30,7 @@ const covertDataToTreeObject = (arr) => {
   return treeObj
 }
 
-// 新增一欄資料
+// 新增一列資料
 const addInput = () => {
   rawData.push([])
 }
@@ -47,33 +47,8 @@ const deleteInput = () => {
   // rawData = rawData.filter((item) => target !== item[0])
 }
 
-// 輸入資料
-
-// 把 rawData 轉換成巢狀物件
-// const deepen = (obj) => {
-//   const result = {}
-
-//   for (const objectPath in obj) {
-//     // Split path into component parts
-//     const parts = objectPath.split('.')
-
-//     // Create sub-objects along path as needed
-//     let target = result
-//     while (parts.length > 1) {
-//       const part = parts.shift()
-//       target = target[part] = target[part] || {}
-//     }
-
-//     // Set value at end of path
-//     target[parts[0]] = obj[objectPath]
-//   }
-
-//   return result
-// }
-
 provide('rawData', readonly(rawData))
 provide('treeData', readonly(covertDataToTreeObject(rawData)))
-// provide('treeData', readonly(deepen(rawData)))
 provide('addInput', addInput)
 provide('deleteInput', deleteInput)
 </script>
