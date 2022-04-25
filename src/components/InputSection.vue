@@ -9,5 +9,5 @@ div.border.border-slate-500
 <script setup>
 import Input from './Input.vue'
 import { ref, inject } from 'vue'
-const addInput = inject('addInput')
+const { addInput } = inject('input')
 </script>

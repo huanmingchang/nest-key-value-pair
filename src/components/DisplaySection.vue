@@ -5,6 +5,6 @@ div.text-slate-200.p-6.border.border-slate-500
 
 <script setup>
 import Display from './Display.vue'
-import { inject } from 'vue'
+import { watch, inject } from 'vue'
 const dataInDisplay = inject('treeData')
 </script>
