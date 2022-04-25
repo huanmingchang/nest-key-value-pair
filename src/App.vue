@@ -9,7 +9,7 @@ div.px-20.pb-20.pt-5.h-screen.bg-slate-900
 <script setup>
 import InputSection from './components/InputSection.vue'
 import DisplaySection from './components/DisplaySection.vue'
-import { provide, ref, reactive, readonly } from 'vue'
+import { provide, watch, computed, reactive, readonly } from 'vue'
 import _ from 'lodash'
 
 let treeObj = reactive({ root: {} })
@@ -30,6 +30,20 @@ const covertDataToTreeObject = (arr) => {
   return treeObj
 }
 
+covertDataToTreeObject(rawData)
+
+// 監聽 rawData，如果資料有變動重新轉成巢狀 object
+watch(
+  rawData,
+  () => {
+    covertDataToTreeObject(rawData)
+  },
+  {
+    immediate: true,
+  },
+  { deep: true }
+)
+
 // 新增一列資料
 const addInput = () => {
   rawData.push([])
@@ -38,17 +52,44 @@ const addInput = () => {
 // 刪除一列資料
 const deleteInput = () => {
   const target = event.target.previousSibling.firstChild.value
-  for (let i = 0; i < rawData.length; i++) {
-    if (target === rawData[i][0]) {
-      rawData.splice(rawData[i], 1)
-    }
-  }
+  let id = event.target.dataset.id
+  rawData.splice(id, 1)
+  // rawData = rawData.filter((item) => rawData.indexOf(item) !== Number(id))
+  // console.log(rawData)
+}
 
-  // rawData = rawData.filter((item) => target !== item[0])
+// 監聽輸入資料
+const onKeyInputChange = () => {
+  let value = event.target.value
+  let id = event.target.dataset.id
+  rawData[Number(id)][0] = value
+}
+
+const onValueInputChange = () => {
+  let value = event.target.value
+  let id = event.target.dataset.id
+
+  if (rawData[Number(id)][0] !== undefined) {
+    rawData[Number(id)][1] = value
+  }
+}
+
+// 點擊時取得資料
+const onInputClick = () => {
+  let currentValue = event.target.value
+  console.log(currentValue)
 }
 
 provide('rawData', readonly(rawData))
-provide('treeData', readonly(covertDataToTreeObject(rawData)))
-provide('addInput', addInput)
-provide('deleteInput', deleteInput)
+provide(
+  'treeData',
+  computed(() => treeObj)
+)
+provide('input', {
+  addInput,
+  deleteInput,
+  onKeyInputChange,
+  onValueInputChange,
+  onInputClick,
+})
 </script>
