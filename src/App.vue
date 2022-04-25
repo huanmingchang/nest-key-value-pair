@@ -55,7 +55,7 @@ const deleteInput = () => {
   let id = event.target.dataset.id
   rawData.splice(id, 1)
   // rawData = rawData.filter((item) => rawData.indexOf(item) !== Number(id))
-  console.log(rawData)
+  // console.log(rawData)
 }
 
 // 監聽輸入資料
